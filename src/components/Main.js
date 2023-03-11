@@ -1,26 +1,10 @@
 import React from "react";
-import { api } from "../utils/api.js";
 import Card from "./Card.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function Main(props) {
-  /* Хуки */
-  const [userAvatar, setUserAvatar] = React.useState("");
-  const [userName, setUserName] = React.useState("");
-  const [userDescription, setUserDescription] = React.useState("");
-  const [cards, setCards] = React.useState([]);
-
-  React.useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getInitialCard()])
-      .then(([userArr, initialCards]) => {
-        setUserName(userArr.name);
-        setUserDescription(userArr.about);
-        setUserAvatar(userArr.avatar);
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.error(`Ошибка: ${err}`);
-      });
-  }, []);
+  /* Подписываемся и получаем значение контекста */
+  const currentUser = React.useContext(CurrentUserContext);
 
   return (
     <main className="content">
@@ -33,16 +17,20 @@ function Main(props) {
               className="profile__avatar-button"
               onClick={props.onEditAvatar}
             ></button>
-            <img className="profile__image" src={userAvatar} alt="Аватарка" />
+            <img
+              className="profile__image"
+              src={currentUser.avatar}
+              alt="Аватарка"
+            />
           </div>
           <div className="profile__information">
-            <h1 className="profile__name">{userName}</h1>
+            <h1 className="profile__name">{currentUser.name}</h1>
             <button
               type="button"
               className="profile__edit-button"
               onClick={props.onEditProfile}
             ></button>
-            <p className="profile__description">{userDescription}</p>
+            <p className="profile__description">{currentUser.about}</p>
           </div>
         </div>
         <button
@@ -54,12 +42,14 @@ function Main(props) {
       {/* Добавленные карточки */}
       <section className="cards">
         <div className="elements">
-          {cards.map((element) => {
+          {props.cards.map((element) => {
             return (
               <Card
                 card={element}
                 key={element._id}
                 onCardClick={props.onCardClick}
+                onCardLike={props.onCardLike}
+                onDeleteCard={props.onDeleteCard}
               />
             );
           })}

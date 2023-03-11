@@ -33,10 +33,7 @@ class Api {
     return fetch(`${this._url}/users/me`, {
       headers: this._headers,
       method: "PATCH",
-      body: JSON.stringify({
-        name: data.name,
-        about: data.about,
-      }),
+      body: JSON.stringify(data),
     }).then((res) => this._checkResponse(res));
   }
 
@@ -45,9 +42,7 @@ class Api {
     return fetch(`${this._url}/users/me/avatar`, {
       headers: this._headers,
       method: "PATCH",
-      body: JSON.stringify({
-        avatar: data.avatar,
-      }),
+      body: JSON.stringify(data),
     }).then((res) => this._checkResponse(res));
   }
 
@@ -56,10 +51,7 @@ class Api {
     return fetch(`${this._url}/cards`, {
       method: "POST",
       headers: this._headers,
-      body: JSON.stringify({
-        name: item.cardname,
-        link: item.cardlink,
-      }),
+      body: JSON.stringify(item),
     }).then((res) => this._checkResponse(res));
   }
 
@@ -80,11 +72,20 @@ class Api {
   }
 
   // Публичный метод удаления лайка карточки
-  deletelikeCard(id) {
+  deleteLikeCard(id) {
     return fetch(`${this._url}/cards/${id}/likes`, {
       headers: this._headers,
       method: "DELETE",
     }).then((res) => this._checkResponse(res));
+  }
+
+  // Публичный метод переключения лайка и дизлайка карточки
+  changeLikeCardStatus(cardId, isLiked) {
+    if (isLiked) {
+      return this.likeCard(cardId);
+    } else {
+      return this.deleteLikeCard(cardId);
+    }
   }
 }
 
